@@ -11,14 +11,23 @@ local M = {}
 
 -- Type definition
 local type_def = function(s)
+    -- Boolean check
     if s == nil then
         return nil
     end
 
+    if s == "true" then
+        return true
+    elseif s == "false" then
+        return false
+    end
+
+    -- String
     if type(s) == "string" then
         return s
     end
-    
+        
+    -- Number
     return tonumber(s)
 end
 
