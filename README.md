@@ -1,5 +1,7 @@
 ## Info
-Very simple and small library for your ini files.
+Very simple and small library for your ini.
+Support for load and saving ini files.
+Warning: there is no support for load and save comments. Because it doesn't make sense.
 
 ## Ini exepmle
 ```ini
@@ -25,6 +27,8 @@ local ini = require "ini"
 
 -- load & parse ini file
 local ini_conf = ini.parse(ini.load("conf_test.ini"))
+-- or 
+-- local ini_conf = ini.loadParse("conf_test.ini")
 
 -- Test
 print("global var")
