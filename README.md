@@ -3,7 +3,7 @@ Very simple and small library for your ini.
 Support for load and saving ini files.
 Warning: there is no support for load and save comments. Because it doesn't make sense.
 
-## Ini exepmle
+## Ini Exemple
 ```ini
 ; Global var
 name = Cool Game
