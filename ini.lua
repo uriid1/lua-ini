@@ -1,44 +1,55 @@
---[[
-    ####--------------------------------####
-    #--# Author:   by uriid1            #--#
-    #--# License:  GNU GPLv3            #--#
-    #--# Telegram: @main_moderator      #--#
-    #--# E-mail:   appdurov@gmail.com   #--#
-    ####--------------------------------####
---]]
+-- ####--------------------------------####
+-- #--# Author:   by uriid1            #--#
+-- #--# License:  GNU GPLv3            #--#
+-- #--# Telegram: @main_moderator      #--#
+-- #--# E-mail:   appdurov@gmail.com   #--#
+-- ####--------------------------------####
 
-local M = {}
+local M = {
+    _version = 1.0.01;
+}
 
 -- Type definition
 local type_def = function(s)
+    -- nil
     if s == nil then
         return nil
     end
 
-    if type(s) == "string" then
-        return s
+    -- number
+    local num = tonumber(s)
+    if num then
+        return num
     end
-    
-    return tonumber(s)
+
+    -- boolean
+    if s == "true" then
+        return true
+    elseif s == "false" then
+        return false
+    end
+
+    -- string
+    return s
 end
 
--- Load ini file
-function M.load(fname)
-    local file = io.open(fname)
+-- Load text file
+function file_read(path)
+    local file = io.open(path)
     local rfile = file:read("*a")
     file:close()
     return rfile
 end
 
--- Parse
-function M.parse(str)
+-- Parse ini text
+local function parse(str)
 
-    local result = {}
-    local section = nil
+    local result   = {}
+    local section  = nil
 
     for line in string.gmatch(str, "[^\n]+") do
         -- Find and add section
-        local find_section = line:match("%[(%S+)%]")
+        local find_section = line:match("^%[(.+)%]$")
         if find_section then
             if not result[line] then
                 section = find_section
@@ -47,7 +58,7 @@ function M.parse(str)
         end
 
         -- Add key = val
-        local key, val = line:match("(%w+)%s+=%s+(.+)")
+        local key, val = line:match('^(.-)%s*=%s*(.+)%s*$')
         if key then
             if section then
                 result[section][key] = type_def(val)
@@ -58,6 +69,42 @@ function M.parse(str)
     end
 
     return result
+end
+
+-- Load and parse 
+function M.parse(path)
+    return parse(file_read(path))
+end
+
+-- For compatibility with older versions
+M.loadParse = M.parse
+
+-- Save ini
+-- M.save(table_to_ini, path_to_save)
+function M.save(t, path)
+    local global = "; Global var\n"
+    local default = ""
+
+    -- Parse
+    for k, v in pairs(t) do
+        if type(t[k]) == "table" then
+            default = default .. ("\n[%s]"):format(k)
+            for k1, v1 in pairs(t[k]) do
+                default = default .. ("\n%s = %s"):format(k1, v1)
+            end
+
+            default = default .. "\n"
+        else
+            global = global .. ("%s = %s\n"):format(k, v)
+        end
+    end
+
+    -- Save
+    local file = io.open(path, "w")
+    file:write(global .. default)
+    file:close()
+    
+    return true
 end
 
 return M
