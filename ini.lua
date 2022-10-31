@@ -5,8 +5,9 @@
 -- #--# E-mail:   appdurov@gmail.com   #--#
 -- ####--------------------------------####
 
+-- test 2
 local M = {
-    _version = 1.0.01;
+    _version = 1.0;
 }
 
 -- Type definition
