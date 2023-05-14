@@ -1,63 +1,166 @@
 --[[
     ####--------------------------------####
     #--# Author:   by uriid1            #--#
-    #--# License:  GNU GPLv3            #--#
-    #--# Telegram: @main_moderator      #--#
-    #--# E-mail:   appdurov@gmail.com   #--#
+    #--# license:  GNU GPL              #--#
+    #--# telegram: @main_moderator      #--#
+    #--# Mail:     appdurov@gmail.com   #--#
     ####--------------------------------####
 --]]
 
-local M = {}
+local ini = { _version = 1.1 }
 
--- Type definition
-local type_def = function(s)
-    if s == nil then
+local function convert(val)
+    -- nil
+    if val == nil then
         return nil
     end
 
-    if type(s) == "string" then
-        return s
+    -- number
+    local num = tonumber(val)
+    if num then
+        return num
     end
+
+    -- boolean
+    if val == 'true' then
+        return true
+    elseif val == 'false' then
+        return false
+    end
+
+    -- Table
+    if type(val) == 'table' then
+        return val
+    end
+
+    -- string
+    local str = tostring(val)
+        :gsub('\'(.+)\'', '%1')
+        :gsub('\"(.+)\"', '%1')
     
-    return tonumber(s)
+    return str
 end
 
--- Load ini file
-function M.load(fname)
-    local file = io.open(fname)
-    local rfile = file:read("*a")
-    file:close()
-    return rfile
+local function file_read(path)
+    local fd = io.open(path)
+
+    if fd == nil then
+        return nil
+    end
+
+    local data = fd:read('*a'); fd:close()
+    return data
 end
 
--- Parse
-function M.parse(str)
+-- Parse text-ini
+local function parse(str)
+    local data = {}
+    local section
 
-    local result = {}
-    local section = nil
+    for line in string.gmatch(str, '[^\n]+') do
+        local comment = line:match('^[%#%;]')
+        if comment then
+            goto continue
+        end
 
-    for line in string.gmatch(str, "[^\n]+") do
-        -- Find and add section
-        local find_section = line:match("%[(%S+)%]")
+        -- Add section
+        local find_section = line:match('^%[(.+)%]$')
         if find_section then
-            if not result[line] then
+            -- Replace spaces 
+            find_section = find_section:gsub(' ', '_')
+            
+            if not data[line] then
                 section = find_section
-                result[section] = {}
+                data[section] = {}
             end
         end
 
         -- Add key = val
-        local key, val = line:match("(%w+)%s+=%s+(.+)")
-        if key then
-            if section then
-                result[section][key] = type_def(val)
-            else
-                result[key] = type_def(val)
+        local key, val = line:match('^(.-)%s*=%s*(.+)$')
+        if key and val then
+            -- Replace comment
+            val = val:gsub('^(.+)%s*;.+$', '%1')
+
+            local isArray = key:sub(-2) == '[]'
+            if isArray then
+                local arr = {}
+                for value in string.gmatch(val, '[^,%s*]+') do
+                    table.insert(arr, convert(value))
+                end
+
+                key = key:sub(1, -3)
+                val = arr
             end
+
+            if section then
+                data[section][key] = convert(val)
+            else
+                data[key] = convert(val)
+            end
+        end
+
+        ::continue::
+    end
+
+    return data
+end
+
+-- Load and parse ini-file
+function ini.parse(file)
+    local data = file_read(file)
+
+    if data == nil then
+        return nil
+    end
+
+    return parse(data)
+end
+
+-- Save ini-file
+function ini.save(tbl, path)
+    if type(tbl) ~= 'table' or type(path) ~= 'string' then
+        return false
+    end
+
+    local global = '; Global var\n'
+    local data = ''
+
+    -- To text
+    for key, val in pairs(tbl) do
+        local section = tbl[key]
+
+        if type(section) == 'table' then
+            data = data .. ('\n[%s]'):format(key)
+
+            for sectionKey, sectionValue in pairs(section) do
+                -- Is array
+                if type(sectionValue) == 'table' then
+                    local arr2str = ''
+                    for i = 1, #sectionValue do
+                        if i == #sectionValue  then
+                            arr2str = arr2str .. sectionValue[i]
+                        else
+                            arr2str = arr2str .. sectionValue[i] .. ', '
+                        end
+                    end
+                    data = data .. ('\n%s = %s'):format(sectionKey, arr2str)
+                else
+                    data = data .. ('\n%s = %s'):format(sectionKey, sectionValue)
+                end
+            end
+
+            data = data .. '\n'
+        else
+            global = global .. ('%s = %s\n'):format(key, val)
         end
     end
 
-    return result
+    -- Save
+    local file = io.open(path, 'w')
+    file:write(global .. data)
+    file:close()
+    
+    return true
 end
 
-return M
+return ini
