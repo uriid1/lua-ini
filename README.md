@@ -14,7 +14,7 @@ __version = 1.1
 
 ; Comment
 [section_name]
-speed = 100		; Game speed
+speed = 100     ; Game speed
 gravity = 0.1   # Game gravity
 
 [all_types_TEST]

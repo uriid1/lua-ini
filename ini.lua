@@ -135,14 +135,7 @@ function ini.save(tbl, path)
             for sectionKey, sectionValue in pairs(section) do
                 -- Is array
                 if type(sectionValue) == 'table' then
-                    local arr2str = ''
-                    for i = 1, #sectionValue do
-                        if i == #sectionValue  then
-                            arr2str = arr2str .. sectionValue[i]
-                        else
-                            arr2str = arr2str .. sectionValue[i] .. ', '
-                        end
-                    end
+                    local arr2str = table.concat(sectionValue, ', ')
                     data = data .. ('\n%s = %s'):format(sectionKey, arr2str)
                 else
                     data = data .. ('\n%s = %s'):format(sectionKey, sectionValue)
