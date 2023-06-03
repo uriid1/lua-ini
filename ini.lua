@@ -1,13 +1,13 @@
 --[[
-    ####--------------------------------####
-    #--# Author:   by uriid1            #--#
-    #--# license:  GNU GPL              #--#
-    #--# telegram: @main_moderator      #--#
-    #--# Mail:     appdurov@gmail.com   #--#
-    ####--------------------------------####
+    [------------------------------------]
+    [   Author:   uriid1                 ]
+    [   License:  GNU GPLv3              ]
+    [   Telegram: @main_moderator        ]
+    [   E-mail:   appdurov@gmail.com     ]
+    [------------------------------------]
 --]]
 
-local ini = { _version = 1.1 }
+local ini = { _version = 1.2 }
 
 local function convert(val)
     -- nil
@@ -35,20 +35,22 @@ local function convert(val)
 
     -- string
     local str = tostring(val)
-        :gsub('\'(.+)\'', '%1')
-        :gsub('\"(.+)\"', '%1')
+        :gsub('\'(.-)\'', '%1')
+        :gsub('\"(.-)\"', '%1')
     
     return str
 end
 
 local function file_read(path)
-    local fd = io.open(path)
+    local fd = io.open(path, 'r')
 
-    if fd == nil then
+    if not io.type(fd) == 'file' then
         return nil
     end
 
-    local data = fd:read('*a'); fd:close()
+    local data = fd:read('*a')
+    fd:close()
+
     return data
 end
 
@@ -109,7 +111,7 @@ end
 function ini.parse(file)
     local data = file_read(file)
 
-    if data == nil then
+    if not data then
         return nil
     end
 
@@ -122,7 +124,7 @@ function ini.save(tbl, path)
         return false
     end
 
-    local global = '; Global var\n'
+    local global = '# Global var\n'
     local data = ''
 
     -- To text
@@ -149,9 +151,13 @@ function ini.save(tbl, path)
     end
 
     -- Save
-    local file = io.open(path, 'w')
-    file:write(global .. data)
-    file:close()
+    local fd = io.open(path, 'w')
+    if not io.type(fd) == 'file' then
+        return false
+    end
+
+    fd:write(global .. data)
+    fd:close()
     
     return true
 end
