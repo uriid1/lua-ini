@@ -1,9 +1,13 @@
-## Info
-Simple and small library for your ini.</br>
-Support for load and saving ini files.</br>
-Warning: there is no support for load and save comments. Because it doesn't make sense.
+# lua-ini
 
-## File format
+Support for load and saving ini files.
+
+---
+
+> [!warning]
+> There is no support for load and save comments. Because it doesn't make sense.
+
+# Format
 ```ini
 ; One line comment
 # Unix style comment
@@ -28,7 +32,7 @@ var_arr_fruits[] = apple, banana, orange
 var_arr_mutate[] = 1, banana, 2, orange
 ```
 
-## Usage example
+# Example
 ```lua
 local ini = require 'ini'
 local conf = ini.parse 'conf_test.ini'
