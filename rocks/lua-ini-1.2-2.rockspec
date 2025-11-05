@@ -2,6 +2,7 @@ package = "lua-ini"
 version = "1.2-2"
 source = {
   url = "git+https://github.com/uriid1/lua-ini.git",
+  tag = "v1.2.2"
 }
 description = {
   summary = "Simple and small library for your ini",
