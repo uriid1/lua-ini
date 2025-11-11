@@ -84,7 +84,7 @@ local function parse(str)
       if isArray then
         local arr = {}
         for value in string.gmatch(val, '[^,%s*]+') do
-            table.insert(arr, convert(value))
+          table.insert(arr, convert(value))
         end
 
         key = key:sub(1, -3)
@@ -132,7 +132,7 @@ end
 -- }, "config.ini")
 function ini.save(tbl, path)
   if type(tbl) ~= 'table' or type(path) ~= 'string' then
-      return false
+    return false
   end
 
   local global = '# Global var\n'
