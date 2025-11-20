@@ -13,15 +13,19 @@ Support for load and saving ini files.
 # Unix style comment
 
 ; Global var
-programName = "Cool Game"
+test = "Hello, World!"
 __version = 1.1
+
+# Environment variable
+lang = ${LANG}
+user = ${USER}
 
 ; Comment
 [section_name]
 speed = 100     ; Game speed
 gravity = 0.1   # Game gravity
 
-[all_types_TEST]
+[types]
 var_int = 123
 var_float = 1.23
 var_bool = true
@@ -35,7 +39,7 @@ var_arr_mutate[] = 1, banana, 2, orange
 # Example
 ```lua
 local ini = require 'ini'
-local conf = ini.parse 'conf_test.ini'
+local conf = ini.parse 'test/conf_test.ini'
 
 -- Test
 print(conf.__verion)

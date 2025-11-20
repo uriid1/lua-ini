@@ -25,4 +25,4 @@ local tbl = {
   }
 }
 
-ini.save(tbl, 'foo_foo.ini')
+ini.save(tbl, 'test/foo_foo.ini')

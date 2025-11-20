@@ -42,7 +42,7 @@ local function file_read(path)
   local fd = io.open(path, 'r')
 
   if not (io.type(fd) == 'file') then
-    return nil
+    error('unable to open file: ' .. path, 3)
   end
 
   local data = fd:read('*a')
@@ -76,9 +76,17 @@ local function parse(str)
 
     -- Add key = val
     local key, val = line:match('^(.-)%s*=%s*(.+)$')
+
     if key and val then
       -- Replace comment
       val = val:gsub('^(.+)%s*;.+$', '%1')
+
+      -- Environment variable support
+      if string.find(val, '%${([%w_]+)}') then
+        val = string.gsub(val, '%${([%w_]+)}', function (_env_val)
+          return os.getenv(_env_val)
+        end)
+      end
 
       local isArray = key:sub(-2) == '[]'
       if isArray then
@@ -112,11 +120,6 @@ end
 -- print(cfg.server.host, cfg.server.port)
 function ini.parse(file)
   local data = file_read(file)
-
-  if not data then
-    return nil
-  end
-
   return parse(data)
 end
 

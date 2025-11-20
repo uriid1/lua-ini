@@ -2,7 +2,7 @@
 local ini = require 'ini'
 
 -- load & parse ini file
-local conf = ini.parse 'test.ini'
+local conf = ini.parse 'test/test.ini'
 
 local global = {}
 
